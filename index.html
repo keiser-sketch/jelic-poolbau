@@ -8,6 +8,21 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-PGS4LMQG');</script>
   <!-- End Google Tag Manager -->
+  <!-- Tracking — dataLayer init + unified trackEvent helper -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function getCookie(n){var m=document.cookie.match('(^|;)\s*'+n+'\s*=\s*([^;]+)');return m?decodeURIComponent(m.pop()):'';}
+    window.trackEvent = function(dl, me, p){
+      var id = dl+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,9);
+      window.dataLayer.push(Object.assign({event:dl, event_id:id}, p||{}));
+      if(typeof fbq !== 'undefined' && me){
+        var std = ['Lead','InitiateCheckout','Schedule','PageView'].indexOf(me) >= 0;
+        fbq(std?'track':'trackCustom', me, Object.assign({}, p||{}), {eventID: id});
+      }
+      return id;
+    };
+  </script>
+
   <!-- Meta Pixel -->
   <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -17,6 +32,8 @@
     (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init','1699867584661684');
     fbq('track','PageView');
+    // Advanced Matching: fbp/fbc + fbclid → Meta Match Quality Score 7+
+    (function(){var p=getCookie('_fbp'),k=getCookie('_fbc')||(location.search.match(/[?&]fbclid=([^&]+)/)||[])[1]||'';if(p||k)fbq('init','1699867584661684',{fbp:p||undefined,fbc:k||undefined});})();
   </script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1699867584661684&ev=PageView&noscript=1"></noscript>
   <!-- End Meta Pixel -->
@@ -5042,6 +5059,24 @@ const kfg = (function(){
     showStage(step);
     update();
     scrollToStage();
+    // Step-Tracking (Falk Briefing v4 · Schritt 5)
+    // trackedSteps Guard: kein Re-Fire beim Zurückgehen
+    if(!window._kfgTS) window._kfgTS = new Set();
+    var _sn = n + 1;
+    if(!window._kfgTS.has(_sn)){
+      window._kfgTS.add(_sn);
+      var _smap = {
+        1:{dl:'configurator_started', meta:'CustomizeProduct', p:{content_name:'Pool-Konfigurator'}},
+        2:{dl:'configurator_step_2',  meta:'configurator_step_2',  p:{}},
+        3:{dl:'configurator_step_3',  meta:'configurator_step_3',  p:{}},
+        4:{dl:'configurator_step_4',  meta:'configurator_step_4',  p:{}},
+        5:{dl:'configurator_step_5',  meta:'configurator_step_5',  p:{}},
+        6:{dl:'configurator_step_6',  meta:'configurator_step_6',  p:{}},
+        7:{dl:'configurator_step_7',  meta:'configurator_step_7',  p:{}},
+      };
+      var _se = _smap[_sn];
+      if(_se) trackEvent(_se.dl, _se.meta, _se.p);
+    }
   }
 
   function next(){
@@ -5353,7 +5388,12 @@ async function submit(){
     'Termin-Wunsch':         state.appointment ? state.appointment.human : '— Bitte vereinbaren —',
     'Nachricht':             msg || '— Keine —',
     'Eingegangen am':        new Date().toLocaleString('de-DE'),
-    'Quelle':                'Pool-Konfigurator · jelicgalabau.de'
+    'Quelle':                'Pool-Konfigurator · jelicgalabau.de',
+    // CAPI-Tracking-Metadata (für serverseitige Meta CAPI Integration)
+    '_event_id':    (typeof _kEventId !== 'undefined' ? _kEventId : ''),
+    '_fbp':         getCookie('_fbp') || '',
+    '_fbc':         getCookie('_fbc') || '',
+    '_source_url':  location.href
   };
 
   // Auto-Reply Text-Block (kein HTML — FormSubmit rendert es im "table"-Template)
@@ -5390,6 +5430,40 @@ Mit besten Grüßen
 Domenik Jelić
 Jelić Galabau · Stuttgart
 Premium Partner: RivieraPool · NORDIQ Pools`;
+
+  // ── Tracking — BEVOR Backend-Call (Intent tracken auch wenn Server down) ──
+  // ── Tracking vor Backend-Call (Falk Briefing v4) ────────────
+  // Kein Pool-Config in dataLayer — nur Lead-Intent + Kontaktdaten
+  const _kEventId = typeof trackEvent !== 'undefined' ? trackEvent(
+    'lead_submitted',
+    'Lead',
+    {
+      content_name:  'Konfigurator-Lead',
+      value:         100000,
+      currency:      'EUR',
+      form_location: 'konfigurator_ende',
+      em: mail, ph: tel, fn: vorname, ln: nachname,
+      zp: plz, country: 'de',
+      fbp: getCookie('_fbp'), fbc: getCookie('_fbc')
+    }
+  ) : ('kfg_' + Date.now());
+
+  // GA4 via dataLayer — kein Pool-Config per Briefing
+  window.dataLayer && window.dataLayer.push({
+    event:         'lead_submitted',
+    form_location: 'konfigurator_ende',
+    event_id:      _kEventId
+  });
+
+  // Google Ads Conversion
+  if(typeof gtag !== 'undefined'){
+    gtag('event', 'conversion', {
+      send_to:        KFG_CONFIG.gtagConversionId,
+      value:          (t.lo || 0),
+      currency:       'EUR',
+      transaction_id: _kEventId
+    });
+  }
 
   // Senden über zentrale Helper-Funktion
   const result = await kfgSendMail({
@@ -5773,19 +5847,27 @@ Premium Partner: RivieraPool · NORDIQ Pools`;
       `Ihr Termin am ${fmtSlotForUser()} ist verbindlich reserviert. Domenik kommt persönlich zu Ihnen.`;
     goToStage(3);
 
-    // Tracking
+    // Tracking — unified via trackEvent (GTM + Meta Pixel + GA4)
+    const _tEventId = typeof trackEvent !== 'undefined' ? trackEvent(
+      'lead_submitted',
+      'Schedule',
+      {
+        content_name:  'Vor-Ort-Termin',
+        form_location: 'termin_buchung',
+        em: mail, ph: tel, fn: vorname, ln: nachname, zp: plz, country: 'de',
+        fbp: getCookie('_fbp'), fbc: getCookie('_fbc')
+      }
+    ) : ('termin_' + Date.now());
+
+    window.dataLayer && window.dataLayer.push({
+      event: 'lead_submitted', form_location: 'termin_buchung', event_id: _tEventId
+    });
+
     if(typeof gtag !== 'undefined'){
       gtag('event', 'conversion', {
         send_to: KFG_CONFIG.gtagConversionId,
-        value: 0,
-        currency: 'EUR',
-        transaction_id: 'termin_' + Date.now()
+        value: 0, currency: 'EUR', transaction_id: _tEventId
       });
-      gtag('event', 'book_appointment', { method: 'standalone_calendar' });
-    }
-    if(typeof fbq !== 'undefined'){
-      fbq('track', 'Schedule');
-      fbq('trackCustom', 'TerminBooked', { source: 'standalone' });
     }
   }
 
@@ -6235,5 +6317,119 @@ console.log('%c✦ Jelić Live Engine v4','color:#6DB4C1;font-weight:700;font-si
 })();
 </script>
 
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   JELIĆ — Section Tracking (Falk Briefing v4 · Schritt 4)
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  var SECTIONS = [
+    { sel:'.hero',        name:'hero' },
+    { sel:'.subst',       name:'ueber_uns' },
+    { sel:'.disc',        name:'pool_modelle' },
+    { sel:'.kfg',         name:'konfigurator' },
+    { sel:'.refs,.refhero',name:'referenzen' },
+    { sel:'.process',     name:'prozess' },
+    { sel:'.faq',         name:'faq' },
+    { sel:'.direct',      name:'kontakt' },
+  ];
+  var times={}, hasEntered={};
+
+  function dl(event, extra){
+    window.dataLayer && window.dataLayer.push(Object.assign({event:event},extra||{}));
+  }
+
+  function enter(name){
+    times[name]=Date.now();
+    if(!hasEntered[name]){ hasEntered[name]=1; dl('section_entered',{section_name:name}); }
+  }
+  function exit(name,reason){
+    if(!times[name]) return;
+    var secs=Math.round((Date.now()-times[name])/1000);
+    times[name]=null;
+    dl('section_exited',{section_name:name,time_in_section_seconds:secs,exit_reason:reason});
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    SECTIONS.forEach(function(s){
+      var el=document.querySelector(s.sel);
+      if(!el) return;
+      var obs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting) enter(s.name);
+          else if(times[s.name]) exit(s.name,'scrolled_away');
+        });
+      },{threshold:0.5});
+      obs.observe(el);
+    });
+
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden) Object.keys(times).forEach(function(n){ if(times[n]) exit(n,'tab_hidden'); });
+    });
+    window.addEventListener('beforeunload',function(){
+      Object.keys(times).forEach(function(n){ if(times[n]) exit(n,'page_unload'); });
+    });
+  });
+})();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   JELIĆ — CTA-Click-Tracking (Falk Briefing v4 · Schritt 6)
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  var CTA_MAP=[
+    {sel:'.nav-cta',        section:'header',   pos:1},
+    {sel:'[href="#config"]',section:'mid_page', pos:1},
+    {sel:'.disc-link',      section:'mid_page', pos:1},
+    {sel:'.hero a[href="#config"], .hero-cta', section:'hero', pos:1},
+  ];
+  function track(section,pos){
+    window.dataLayer&&window.dataLayer.push({event:'cta_clicked',cta_section:section,cta_position:pos});
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    CTA_MAP.forEach(function(item){
+      document.querySelectorAll(item.sel).forEach(function(el){
+        if(el._ctaT) return; el._ctaT=1;
+        el.addEventListener('click',function(){ track(item.section,item.pos); });
+      });
+    });
+    // data-attribute pattern
+    document.querySelectorAll('[data-cta-section]').forEach(function(el){
+      if(el._ctaT) return; el._ctaT=1;
+      el.addEventListener('click',function(){
+        track(el.dataset.ctaSection,parseInt(el.dataset.ctaPosition||1));
+      });
+    });
+    // tel + mailto → Meta Contact event
+    document.querySelectorAll('a[href^="tel:"],a[href^="mailto:"]').forEach(function(el){
+      if(el._ctaT) return; el._ctaT=1;
+      el.addEventListener('click',function(){
+        window.dataLayer&&window.dataLayer.push({event:'cta_clicked',cta_section:'contact_links',
+          cta_position:el.href.startsWith('tel:')?'phone':'email'});
+        typeof fbq!=='undefined'&&fbq('track','Contact');
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   JELIĆ — FAQ-Tracking (Falk Briefing v4 · Schritt 7)
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  function attach(){
+    document.querySelectorAll('.faq-item h3,.faq-item button,.faq-q,[data-faq-q]').forEach(function(btn){
+      if(btn._faqT) return; btn._faqT=1;
+      btn.addEventListener('click',function(){
+        var q=(btn.textContent||'').trim().slice(0,120)||'unknown';
+        window.dataLayer&&window.dataLayer.push({event:'faq_opened',faq_question:q});
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded',function(){ attach(); setTimeout(attach,2500); });
+})();
+</script>
 </body>
 </html>
