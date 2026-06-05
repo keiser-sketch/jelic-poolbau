@@ -2604,15 +2604,15 @@ section[id]{scroll-margin-top:80px}
     </div>
 
     <div class="nav-menu">
-      <a href="#disciplines" class="nav-link">Leistungen</a>
-      <a href="#config" class="nav-link">Konfigurator</a>
-      <a href="#refs" class="nav-link">Referenzen</a>
-      <a href="#partners" class="nav-link">Partner</a>
-      <a href="#termin" class="nav-link">Termin</a>
-      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="#disciplines" class="nav-link" data-nav-position="1">Leistungen</a>
+      <a href="#config" class="nav-link" data-nav-position="2">Konfigurator</a>
+      <a href="#refs" class="nav-link" data-nav-position="3">Referenzen</a>
+      <a href="#partners" class="nav-link" data-nav-position="4">Partner</a>
+      <a href="#termin" class="nav-link" data-nav-position="5">Termin</a>
+      <a href="#faq" class="nav-link" data-nav-position="6">FAQ</a>
     </div>
 
-    <a href="#termin" class="nav-cta">
+    <a href="#termin" class="nav-cta" data-nav-position="cta">
       <span>Termin buchen</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </a>
@@ -2661,11 +2661,11 @@ section[id]{scroll-margin-top:80px}
         Seit zwölf Jahren bauen wir Außenanlagen mit Handwerk und Sorgfalt — vom geschwungenen Gartenweg bis zum <strong>maßgefertigten Pool</strong>. Drei Disziplinen, ein Anspruch: <strong>Festpreis, festes Datum, eine Baustelle.</strong>
       </p>
       <div class="hero-actions" id="heroActions">
-        <a href="#config" class="btn-magnetic">
+        <a href="#config" class="btn-magnetic" data-cta-section="hero" data-cta-position="1">
           <span>Projekt anfragen</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a href="#disciplines" class="btn-text">
+        <a href="#disciplines" class="btn-text" data-cta-section="hero" data-cta-position="2">
           Leistungen entdecken
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
@@ -2793,7 +2793,7 @@ section[id]{scroll-margin-top:80px}
       </div>
       <h3 class="disc-h">Gartengestaltung</h3>
       <p class="disc-p">Individuelle Planung von Außenanlagen, Bepflanzung, Wegen und Sichtachsen — maßgeschneidert auf Ihr Grundstück und Ihren Lebensstil.</p>
-      <a href="#direct" class="disc-link">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#direct" class="disc-link" data-cta-section="leistungen" data-cta-position="1">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
     <div class="disc-card" data-d="g2">
       <div class="disc-num">02 / Garten <span></span></div>
@@ -2802,7 +2802,7 @@ section[id]{scroll-margin-top:80px}
       </div>
       <h3 class="disc-h">Gartenpflege</h3>
       <p class="disc-p">Regelmäßige Pflege, Rasenarbeiten, Heckenschnitt und saisonale Betreuung — damit Ihr Garten dauerhaft schön bleibt. Wartungsverträge ab 2.400 €/Jahr.</p>
-      <a href="#direct" class="disc-link">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#direct" class="disc-link" data-cta-section="leistungen" data-cta-position="2">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
     <div class="disc-card" data-d="l">
       <div class="disc-num">03 / Landschaft <span></span></div>
@@ -2811,7 +2811,7 @@ section[id]{scroll-margin-top:80px}
       </div>
       <h3 class="disc-h">Landschaftsbau</h3>
       <p class="disc-p">Pflasterarbeiten, Mauerbau, Treppen und Trockenbauten — wir formen den festen Rahmen Ihres Gartens. 10 Jahre Gewährleistung auf Pflasterarbeiten.</p>
-      <a href="#direct" class="disc-link">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#direct" class="disc-link" data-cta-section="leistungen" data-cta-position="3">Beratung anfragen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
     <div class="disc-card" data-d="p">
       <div class="disc-num">04 / Pool <span class="disc-new">NEU 2026</span></div>
@@ -2820,7 +2820,7 @@ section[id]{scroll-margin-top:80px}
       </div>
       <h3 class="disc-h">Poolbau</h3>
       <p class="disc-p">Skimmer- und Überlaufpools, Naturpools und Schwimmteiche — vom Aushub über die Technik bis zur Beckenrandgestaltung. Riviera Premium Partner.</p>
-      <a href="#config" class="disc-link">Konfigurator öffnen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#config" class="disc-link" data-cta-section="leistungen" data-cta-position="4">Konfigurator öffnen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
   </div>
 </section>
@@ -6401,12 +6401,15 @@ console.log('%c✦ Jelić Live Engine v4','color:#6DB4C1;font-weight:700;font-si
         track(el.dataset.ctaSection,parseInt(el.dataset.ctaPosition||1));
       });
     });
-    // tel + mailto → Meta Contact event
-    document.querySelectorAll('a[href^="tel:"],a[href^="mailto:"]').forEach(function(el){
+    // tel + mailto + whatsapp → contact_click event (+ Meta Contact)
+    document.querySelectorAll('a[href^="tel:"],a[href^="mailto:"],a[href*="wa.me"],a[href^="whatsapp:"],a[href*="api.whatsapp.com"]').forEach(function(el){
       if(el._ctaT) return; el._ctaT=1;
       el.addEventListener('click',function(){
-        window.dataLayer&&window.dataLayer.push({event:'cta_clicked',cta_section:'contact_links',
-          cta_position:el.href.startsWith('tel:')?'phone':'email'});
+        var h=el.getAttribute('href')||'';
+        var method = h.indexOf('tel:')===0 ? 'phone'
+                   : h.indexOf('mailto:')===0 ? 'mail'
+                   : 'whatsapp';
+        window.dataLayer&&window.dataLayer.push({event:'contact_click',method:method});
         typeof fbq!=='undefined'&&fbq('track','Contact');
       });
     });
@@ -6425,6 +6428,25 @@ console.log('%c✦ Jelić Live Engine v4','color:#6DB4C1;font-weight:700;font-si
       btn.addEventListener('click',function(){
         var q=(btn.textContent||'').trim().slice(0,120)||'unknown';
         window.dataLayer&&window.dataLayer.push({event:'faq_opened',faq_question:q});
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded',function(){ attach(); setTimeout(attach,2500); });
+})();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   JELIĆ — Nav-Click-Tracking (nav_click · position)
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  function attach(){
+    document.querySelectorAll('[data-nav-position]').forEach(function(el){
+      if(el._navT) return; el._navT=1;
+      el.addEventListener('click',function(){
+        var raw=el.dataset.navPosition;
+        var pos=(raw==='cta')?'cta':parseInt(raw,10);
+        window.dataLayer&&window.dataLayer.push({event:'nav_click',position:pos});
       });
     });
   }
